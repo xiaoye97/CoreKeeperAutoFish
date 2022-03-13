@@ -1,0 +1,2 @@
+# CoreKeeperAutoFish
+CoreKeeper AutoFish mod
