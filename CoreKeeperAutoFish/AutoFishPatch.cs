@@ -28,18 +28,24 @@ namespace CoreKeeperAutoFish
                 // 如果不在小游戏，则开始拉钩
                 if (!__instance.isInFishingMiniGame)
                 {
-                    var mgr = AutoFish.Mgr;
-                    var info = PugDatabase.GetObjectInfo(__instance.fishStruggleInfo.fishID);
-                    // 获取翻译名字
-                    string fishName = PugText.ProcessText($"Items/{info.objectID}", new UnhollowerBaseLib.Il2CppStringArray(new string[] { }), true, false);
-                    string coolText = AutoFish.GetRandomFishSay(info.rarity, fishName);
-                    //AutoFish.Log.LogInfo(fishName);
-                    Vector3 textPos = mgr.player.RenderPosition + new Vector3(0, 2f, 0);
-                    mgr._textManager.SpawnCoolText(coolText, textPos, mgr._textManager.GetRarityColor(info.rarity), TextManager.FontFace.button, 0.3f, 1, 3, 0.8f, 0.8f);
-                    __instance.BeginPullUp();
-                    autoFishControlInput = true;
-                    autoFishNeedPress = false;
-                    //AutoFish.Log.LogInfo("开始拉杆");
+                    if (AutoFish.SpawnCoolTextOnFishing.Value)
+                    {
+                        var mgr = AutoFish.Mgr;
+                        var info = PugDatabase.GetObjectInfo(__instance.fishStruggleInfo.fishID);
+                        // 获取翻译名字
+                        string fishName = PugText.ProcessText($"Items/{info.objectID}", new UnhollowerBaseLib.Il2CppStringArray(new string[] { }), true, false);
+                        string coolText = AutoFish.GetRandomFishSay(info.rarity, fishName);
+                        //AutoFish.Log.LogInfo(fishName);
+                        Vector3 textPos = mgr.player.RenderPosition + new Vector3(0, 2f, 0);
+                        mgr._textManager.SpawnCoolText(coolText, textPos, mgr._textManager.GetRarityColor(info.rarity), TextManager.FontFace.button, 0.3f, 1, 3, 0.8f, 0.8f);
+                    }
+                    if (AutoFish.EnableAutoFish.Value)
+                    {
+                        __instance.BeginPullUp();
+                        autoFishControlInput = true;
+                        autoFishNeedPress = false;
+                        //AutoFish.Log.LogInfo("开始拉杆");
+                    }
                 }
                 // 如果在小游戏，则根据鱼的状态进行拉钩
                 else
@@ -61,12 +67,15 @@ namespace CoreKeeperAutoFish
         [HarmonyPostfix, HarmonyPatch(typeof(PlayerInput), "IsButtonCurrentlyDown")]
         public static void AutoFishPatch3(PlayerInput __instance, PlayerInput.InputType inputType, ref bool __result)
         {
-            // 如果检测的是使用物品按键，并且现在是钓鱼管控阶段，则根据钓鱼管控返回结果
-            if (inputType == PlayerInput.InputType.SECOND_INTERACT)
+            if (AutoFish.EnableAutoFish.Value)
             {
-                if (autoFishControlInput)
+                // 如果检测的是SECOND_INTERACT按键，并且现在是钓鱼管控阶段，则根据钓鱼管控返回结果
+                if (inputType == PlayerInput.InputType.SECOND_INTERACT)
                 {
-                    __result = autoFishNeedPress;
+                    if (autoFishControlInput)
+                    {
+                        __result = autoFishNeedPress;
+                    }
                 }
             }
         }
