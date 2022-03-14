@@ -1,25 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using BepInEx;
+﻿using HarmonyLib;
 using UnityEngine;
-using BepInEx.IL2CPP;
-using BepInEx.Logging;
-using HarmonyLib;
-using BepInEx.Configuration;
-using System.IO;
 
 namespace CoreKeeperAutoFish
 {
     internal class AutoFishPatch
     {
-        private static bool autoFishControlInput = false;
-        private static bool autoFishNeedPress = false;
+        private static bool autoFishControlInput, autoFishNeedPress, autoThrowPullUp, waitPressedThrow;
 
         [HarmonyPrefix, HarmonyPatch(typeof(PlayerState.Fishing), "UpdateFishOnTheHook")]
-        public static bool AutoFishPatch1(PlayerState.Fishing __instance)
+        public static bool AutoFish_Fishing_UpdateFishOnTheHook_Patch(PlayerState.Fishing __instance)
         {
             // 如果有鱼在钩子上，则开始判断
             if (__instance.fishOnTheHook)
@@ -30,42 +19,65 @@ namespace CoreKeeperAutoFish
                 {
                     if (AutoFish.SpawnCoolTextOnFishing.Value)
                     {
-                        var mgr = AutoFish.Mgr;
                         var info = PugDatabase.GetObjectInfo(__instance.fishStruggleInfo.fishID);
                         // 获取翻译名字
                         string fishName = PugText.ProcessText($"Items/{info.objectID}", new UnhollowerBaseLib.Il2CppStringArray(new string[] { }), true, false);
                         string coolText = AutoFish.GetRandomFishSay(info.rarity, fishName);
-                        //AutoFish.Log.LogInfo(fishName);
-                        Vector3 textPos = mgr.player.RenderPosition + new Vector3(0, 2f, 0);
-                        mgr._textManager.SpawnCoolText(coolText, textPos, mgr._textManager.GetRarityColor(info.rarity), TextManager.FontFace.button, 0.3f, 1, 3, 0.8f, 0.8f);
+                        // 喊出鱼的名字
+                        AutoFish.Say(coolText, info.rarity);
                     }
                     if (AutoFish.EnableAutoFish.Value)
                     {
+                        // 发现鱼，拉杆
                         __instance.BeginPullUp();
                         autoFishControlInput = true;
                         autoFishNeedPress = false;
-                        //AutoFish.Log.LogInfo("开始拉杆");
                     }
                 }
                 // 如果在小游戏，则根据鱼的状态进行拉钩
                 else
                 {
+                    // 根据鱼是否挣扎决定是否按住按键
                     autoFishNeedPress = !__instance.fishIsStruggling;
                 }
             }
             return true;
         }
 
-        [HarmonyPostfix, HarmonyPatch(typeof(PlayerState.Fishing), "OnExitState")]
-        public static void AutoFishPatch2()
+        [HarmonyPostfix, HarmonyPatch(typeof(PlayerState.Fishing), "OnEnterState")]
+        public static void AutoFish_Fishing_OnEnterState_Patch()
         {
-            autoFishControlInput = false;
-            //AutoFish.Log.LogInfo("钓鱼完毕");
+            autoThrowPullUp = false;
         }
 
+        [HarmonyPostfix, HarmonyPatch(typeof(PlayerState.Fishing), "OnExitState")]
+        public static void AutoFish_Fishing_OnExitState_Patch()
+        {
+            autoFishControlInput = false;
+            // 如果退出钓鱼状态时此值为true，说明需要进行自动抛竿
+            if (autoThrowPullUp)
+            {
+                // 喊出抛竿语
+                AutoFish.Say(AutoFish.GetRandomAutoThrowSay(), Color.white);
+                waitPressedThrow = true;
+            }
+        }
+
+        [HarmonyPostfix, HarmonyPatch(typeof(PlayerState.Fishing), "PullUp")]
+        public static void AutoFish_Fishing_PullUp_Patch(bool failedThrow, bool spawnLoot)
+        {
+            if (AutoFish.EnableAutoThrow.Value)
+            {
+                if (!failedThrow && spawnLoot)
+                {
+                    // 如果触发了这里，说明钓鱼成功，才可以继续抛竿，如果没触发这里就触发了OnExitState，说明中断
+                    autoThrowPullUp = true;
+                }
+            }
+        }
 
         [HarmonyPostfix, HarmonyPatch(typeof(PlayerInput), "IsButtonCurrentlyDown")]
-        public static void AutoFishPatch3(PlayerInput __instance, PlayerInput.InputType inputType, ref bool __result)
+        public static void AutoFish_PlayerInput_IsButtonCurrentlyDown_Patch(PlayerInput __instance, PlayerInput.InputType inputType, ref bool __result)
         {
             if (AutoFish.EnableAutoFish.Value)
             {
@@ -75,6 +87,22 @@ namespace CoreKeeperAutoFish
                     if (autoFishControlInput)
                     {
                         __result = autoFishNeedPress;
+                    }
+                }
+            }
+        }
+
+        [HarmonyPostfix, HarmonyPatch(typeof(PlayerInput), "WasButtonPressedDownThisFrame")]
+        public static void AutoFish_PlayerInput_WasButtonPressedDownThisFrame_Patch(PlayerInput __instance, PlayerInput.InputType inputType, ref bool __result)
+        {
+            if (AutoFish.EnableAutoThrow.Value)
+            {
+                if (waitPressedThrow)
+                {
+                    if (inputType == PlayerInput.InputType.SECOND_INTERACT)
+                    {
+                        __result = true;
+                        waitPressedThrow = false;
                     }
                 }
             }
