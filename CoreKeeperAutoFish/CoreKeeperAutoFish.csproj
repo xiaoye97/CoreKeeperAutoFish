@@ -84,6 +84,10 @@
       <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Core Keeper\BepInEx\unhollowed\UnityEngine.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="UnityEngine.AudioModule">
+      <HintPath>..\..\..\Program Files (x86)\Steam\steamapps\common\Core Keeper\BepInEx\unhollowed\UnityEngine.AudioModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Core Keeper\BepInEx\unhollowed\UnityEngine.CoreModule.dll</HintPath>
       <Private>False</Private>

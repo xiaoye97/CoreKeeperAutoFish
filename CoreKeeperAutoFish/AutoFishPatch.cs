@@ -1,11 +1,12 @@
-﻿using HarmonyLib;
+﻿using System;
+using HarmonyLib;
 using UnityEngine;
 
 namespace CoreKeeperAutoFish
 {
     internal class AutoFishPatch
     {
-        private static bool autoFishControlInput, autoFishNeedPress, autoThrowPullUp, waitPressedThrow;
+        private static bool autoFishControlInput, autoFishNeedPress, autoThrowPullUp, waitPressedThrow, isInFishing, canPullUp;
 
         [HarmonyPrefix, HarmonyPatch(typeof(PlayerState.Fishing), "UpdateFishOnTheHook")]
         public static bool AutoFish_Fishing_UpdateFishOnTheHook_Patch(PlayerState.Fishing __instance)
@@ -41,18 +42,51 @@ namespace CoreKeeperAutoFish
                     autoFishNeedPress = !__instance.fishIsStruggling;
                 }
             }
+            else
+            {
+                if (AutoFish.EnableFishItem.Value)
+                {
+                    if (canPullUp)
+                    {
+                        __instance.BeginPullUp();
+                    }
+                }
+            }
             return true;
+        }
+
+        [HarmonyPostfix, HarmonyPatch(typeof(AudioSource), "Play", new Type[] { })]
+        public static void AudioSource_Patch(AudioSource __instance)
+        {
+            if (isInFishing)
+            {
+                if (AutoFish.EnableAutoFish.Value)
+                {
+                    // 如果播放了冒泡音效，并且位置在玩家位置，说明可以拉杆了
+                    if (__instance.clip.name == "bubble")
+                    {
+                        if (Vector3.Distance(__instance.transform.position, AutoFish.Mgr.player.transform.position) < 1f)
+                        {
+                            canPullUp = true;
+                        }
+                    }
+                }
+            }
         }
 
         [HarmonyPostfix, HarmonyPatch(typeof(PlayerState.Fishing), "OnEnterState")]
         public static void AutoFish_Fishing_OnEnterState_Patch()
         {
+            isInFishing = true;
+            canPullUp = false;
             autoThrowPullUp = false;
         }
 
         [HarmonyPostfix, HarmonyPatch(typeof(PlayerState.Fishing), "OnExitState")]
         public static void AutoFish_Fishing_OnExitState_Patch()
         {
+            isInFishing = false;
+            canPullUp = false;
             autoFishControlInput = false;
             // 如果退出钓鱼状态时此值为true，说明需要进行自动抛竿
             if (autoThrowPullUp)

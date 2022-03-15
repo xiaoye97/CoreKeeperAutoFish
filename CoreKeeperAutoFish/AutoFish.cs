@@ -12,6 +12,7 @@ namespace CoreKeeperAutoFish
         public static ConfigEntry<bool> SpawnCoolTextOnFishing;
         public static ConfigEntry<bool> EnableAutoFish;
         public static ConfigEntry<bool> EnableAutoThrow;
+        public static ConfigEntry<bool> EnableFishItem;
 
         public static ConfigEntry<string> RarityPoorTexts;
         public static ConfigEntry<string> RarityCommonTexts;
@@ -52,6 +53,7 @@ namespace CoreKeeperAutoFish
             SpawnCoolTextOnFishing = AutoFishPlugin.Inst.Config.Bind("config", "SpawnCoolTextOnFishing", true, "是否喊出鱼的种类");
             EnableAutoFish = AutoFishPlugin.Inst.Config.Bind("config", "EnableAutoFish", true, "是否启用自动钓鱼");
             EnableAutoThrow = AutoFishPlugin.Inst.Config.Bind("config", "EnableAutoThrow", true, "是否启用自动抛竿");
+            EnableFishItem = AutoFishPlugin.Inst.Config.Bind("config", "EnableFishItem", true, "是否启用钓物品");
             RarityPoorTexts = AutoFishPlugin.Inst.Config.Bind("say", "RarityPoorTexts", "额，{0}你在逗我吗", "遇到垃圾的鱼时说的话");
             RarityCommonTexts = AutoFishPlugin.Inst.Config.Bind("say", "RarityCommonTexts", "一条{0}|{0}，普普通通|原来是{0}|额，{0}|随处可见的{0}|希望下次不是你，{0}", "遇到寻常的鱼时说的话");
             RarityUncommonTexts = AutoFishPlugin.Inst.Config.Bind("say", "RarityUncommonTexts", "咦，{0}|吼吼，是{0}|还行，一条{0}|运气不错，是一条{0}", "遇到不寻常的鱼时说的话");
