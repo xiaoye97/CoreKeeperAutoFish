@@ -10,7 +10,7 @@ namespace CoreKeeperAutoFish
         public const string GUID = "me.xiaoye97.plugin.CoreKeeperAutoFish";
         public const string NAME = "CoreKeeperAutoFish";
         public const string AUTHOR = "xiaoye97";
-        public const string VERSION = "1.2.0";
+        public const string VERSION = "1.3.0";
 
         public static AutoFishPlugin Inst { get; private set; }
         public static ManualLogSource LogSource => Inst.Log;

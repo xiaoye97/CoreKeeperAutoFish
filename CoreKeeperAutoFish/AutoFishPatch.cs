@@ -65,7 +65,10 @@ namespace CoreKeeperAutoFish
                     // 如果播放了冒泡音效，并且位置在玩家位置，说明可以拉杆了
                     if (__instance.clip.name == "bubble")
                     {
-                        if (Vector3.Distance(__instance.transform.position, AutoFish.Mgr.player.transform.position) < 1f)
+                        float distance = Vector3.Distance(__instance.transform.position, AutoFish.Mgr.player.transform.position);
+                        //string log = $"检测到冒泡音效，音效位置:{__instance.transform.position} 玩家位置:{AutoFish.Mgr.player.transform.position} 距离:{distance}";
+                        //AutoFish.Log.LogInfo(log);
+                        if (distance < 5f)
                         {
                             canPullUp = true;
                         }
