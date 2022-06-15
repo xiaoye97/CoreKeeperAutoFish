@@ -101,11 +101,11 @@ namespace CoreKeeperAutoFish
         }
 
         [HarmonyPostfix, HarmonyPatch(typeof(PlayerState.Fishing), "PullUp")]
-        public static void AutoFish_Fishing_PullUp_Patch(bool failedThrow, bool spawnLoot)
+        public static void AutoFish_Fishing_PullUp_Patch(bool failedThrow)
         {
             if (AutoFish.EnableAutoThrow.Value)
             {
-                if (!failedThrow && spawnLoot)
+                if (!failedThrow)
                 {
                     // 如果触发了这里，说明钓鱼成功，才可以继续抛竿，如果没触发这里就触发了OnExitState，说明中断
                     autoThrowPullUp = true;
