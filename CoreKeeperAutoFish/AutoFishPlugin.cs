@@ -1,6 +1,6 @@
 ﻿using BepInEx;
-using BepInEx.IL2CPP;
 using BepInEx.Logging;
+using BepInEx.Unity.IL2CPP;
 
 namespace CoreKeeperAutoFish
 {
@@ -10,7 +10,7 @@ namespace CoreKeeperAutoFish
         public const string GUID = "me.xiaoye97.plugin.CoreKeeperAutoFish";
         public const string NAME = "CoreKeeperAutoFish";
         public const string AUTHOR = "xiaoye97";
-        public const string VERSION = "1.4.0";
+        public const string VERSION = "1.5.0";
 
         public static AutoFishPlugin Inst { get; private set; }
         public static ManualLogSource LogSource => Inst.Log;

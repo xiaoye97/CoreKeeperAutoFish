@@ -1,5 +1,6 @@
 ﻿using System;
 using HarmonyLib;
+using Il2CppInterop.Runtime.InteropTypes.Arrays;
 using UnityEngine;
 
 namespace CoreKeeperAutoFish
@@ -22,7 +23,7 @@ namespace CoreKeeperAutoFish
                     {
                         var info = PugDatabase.GetObjectInfo(__instance.fishStruggleInfo.fishID);
                         // 获取翻译名字
-                        string fishName = PugText.ProcessText($"Items/{info.objectID}", new UnhollowerBaseLib.Il2CppStringArray(new string[] { }), true, false);
+                        string fishName = PugText.ProcessText($"Items/{info.objectID}", new Il2CppStringArray(new string[] { }), true, false);
                         string coolText = AutoFish.GetRandomFishSay(info.rarity, fishName);
                         // 喊出鱼的名字
                         AutoFish.Say(coolText, info.rarity);
