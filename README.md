@@ -12,6 +12,8 @@ CoreKeeper AutoFish mod
 # 下载
 [releases][2]
 
+[Thunderstore][5]
+
 # 安装
 文字教程: [BepInEx install guide][3]
 
@@ -21,3 +23,4 @@ CoreKeeper AutoFish mod
 [2]: https://github.com/xiaoye97/CoreKeeperAutoFish/releases
 [3]: https://docs.bepinex.dev/master/articles/user_guide/installation/index.html
 [4]: https://space.bilibili.com/1306433
+[5]: https://core-keeper.thunderstore.io/package/xiaoye97/AutoFish/

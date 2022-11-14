@@ -9,8 +9,30 @@ namespace CoreKeeperAutoFish
     {
         private static bool autoFishControlInput, autoFishNeedPress, autoThrowPullUp, waitPressedThrow, isInFishing, canPullUp;
 
-        [HarmonyPrefix, HarmonyPatch(typeof(PlayerState.Fishing), "UpdateFishOnTheHook")]
-        public static bool AutoFish_Fishing_UpdateFishOnTheHook_Patch(PlayerState.Fishing __instance)
+        [HarmonyPostfix, HarmonyPatch(typeof(AudioSource), "Play", new Type[] { })]
+        public static void AudioSource_Patch(AudioSource __instance)
+        {
+            if (isInFishing)
+            {
+                if (AutoFish.EnableAutoFish.Value)
+                {
+                    // 如果播放了冒泡音效，并且位置在玩家位置，说明可以拉杆了
+                    if (__instance.clip.name == "bubble")
+                    {
+                        float distance = Vector3.Distance(__instance.transform.position, AutoFish.Mgr.player.transform.position);
+                        //string log = $"检测到冒泡音效，音效位置:{__instance.transform.position} 玩家位置:{AutoFish.Mgr.player.transform.position} 距离:{distance}";
+                        //AutoFish.Log.LogInfo(log);
+                        if (distance < 5f)
+                        {
+                            canPullUp = true;
+                        }
+                    }
+                }
+            }
+        }
+
+        [HarmonyPrefix, HarmonyPatch(typeof(PlayerState.PlayerBaseState), "UpdateFishOnTheHook")]
+        public static bool PlayerBaseState_UpdateFishOnTheHook_Patch(PlayerState.PlayerBaseState __instance)
         {
             // 如果有鱼在钩子上，则开始判断
             if (__instance.fishOnTheHook)
@@ -56,39 +78,18 @@ namespace CoreKeeperAutoFish
             return true;
         }
 
-        [HarmonyPostfix, HarmonyPatch(typeof(AudioSource), "Play", new Type[] { })]
-        public static void AudioSource_Patch(AudioSource __instance)
-        {
-            if (isInFishing)
-            {
-                if (AutoFish.EnableAutoFish.Value)
-                {
-                    // 如果播放了冒泡音效，并且位置在玩家位置，说明可以拉杆了
-                    if (__instance.clip.name == "bubble")
-                    {
-                        float distance = Vector3.Distance(__instance.transform.position, AutoFish.Mgr.player.transform.position);
-                        //string log = $"检测到冒泡音效，音效位置:{__instance.transform.position} 玩家位置:{AutoFish.Mgr.player.transform.position} 距离:{distance}";
-                        //AutoFish.Log.LogInfo(log);
-                        if (distance < 5f)
-                        {
-                            canPullUp = true;
-                        }
-                    }
-                }
-            }
-        }
-
-        [HarmonyPostfix, HarmonyPatch(typeof(PlayerState.Fishing), "OnEnterState")]
-        public static void AutoFish_Fishing_OnEnterState_Patch()
+        [HarmonyPostfix, HarmonyPatch(typeof(PlayerState.PlayerBaseState), "StartFishing")]
+        public static void PlayerBaseState_StartFishing_Patch()
         {
             isInFishing = true;
             canPullUp = false;
             autoThrowPullUp = false;
         }
 
-        [HarmonyPostfix, HarmonyPatch(typeof(PlayerState.Fishing), "OnExitState")]
-        public static void AutoFish_Fishing_OnExitState_Patch()
+        [HarmonyPostfix, HarmonyPatch(typeof(PlayerState.PlayerBaseState), "ExitFishing")]
+        public static void PlayerBaseState_ExitFishing_Patch(PlayerState.PlayerBaseState __instance, bool wasExitingState)
         {
+            if (!wasExitingState) return;
             isInFishing = false;
             canPullUp = false;
             autoFishControlInput = false;
@@ -101,8 +102,8 @@ namespace CoreKeeperAutoFish
             }
         }
 
-        [HarmonyPostfix, HarmonyPatch(typeof(PlayerState.Fishing), "PullUp")]
-        public static void AutoFish_Fishing_PullUp_Patch(bool failedThrow)
+        [HarmonyPostfix, HarmonyPatch(typeof(PlayerState.PlayerBaseState), "PullUp")]
+        public static void AutoFish_Fishing_PullUp_Patch(PlayerState.PlayerBaseState __instance,bool failedThrow)
         {
             if (AutoFish.EnableAutoThrow.Value)
             {
