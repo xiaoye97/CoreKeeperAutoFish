@@ -43,9 +43,9 @@ namespace CoreKeeperAutoFish
             LocalizationModule.AddTerm("AutoFish/Say/AutoThrow[1]", "Hey", "Hey");
             LocalizationModule.AddTerm("AutoFish/Say/AutoThrow[2]", "Fishing is so relaxing", "看我这招如何");
             LocalizationModule.AddTerm("AutoFish/Say/AutoThrow[3]", "Hoping for a big catch", "吃我一竿");
-            LocalizationModule.AddTerm("AutoFish/Say/AutoThrow[4]", "", "大的要来了");
-            LocalizationModule.AddTerm("AutoFish/Say/AutoThrow[5]", "", "这钓鱼多是一件美事");
-            LocalizationModule.AddTerm("AutoFish/Say/AutoThrow[6]", "", "冲呀");
+            LocalizationModule.AddTerm("AutoFish/Say/AutoThrow[4]", "Casting my line", "大的要来了");
+            LocalizationModule.AddTerm("AutoFish/Say/AutoThrow[5]", "This is fun", "这钓鱼多是一件美事");
+            LocalizationModule.AddTerm("AutoFish/Say/AutoThrow[6]", "One more...", "冲呀");
         }
 
         public static string GetRandomPhrase(string prefix)
