@@ -1,10 +1,13 @@
 ﻿using BepInEx;
 using BepInEx.Logging;
 using BepInEx.Unity.IL2CPP;
+using CoreLib;
+using CoreLib.Submodules.Localization;
 
 namespace CoreKeeperAutoFish
 {
     [BepInPlugin(GUID, NAME, VERSION)]
+    [CoreLibSubmoduleDependency(nameof(LocalizationModule))]
     internal class AutoFishPlugin : BasePlugin
     {
         public const string GUID = "me.xiaoye97.plugin.CoreKeeperAutoFish";
@@ -18,6 +21,7 @@ namespace CoreKeeperAutoFish
         public override void Load()
         {
             Inst = this;
+            Strings.Init(Log);
             AutoFish.Init();
             //TestPatch.Init();
         }
