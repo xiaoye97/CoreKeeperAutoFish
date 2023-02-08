@@ -86,7 +86,7 @@ namespace CoreKeeperAutoFish
             autoThrowPullUp = false;
         }
 
-        [HarmonyPostfix, HarmonyPatch(typeof(PlayerState.PlayerBaseState), "ExitFishing")]
+        [HarmonyPostfix, HarmonyPatch(typeof(PlayerState.PlayerBaseState), "OnExitFishing")]
         public static void PlayerBaseState_ExitFishing_Patch(PlayerState.PlayerBaseState __instance, bool wasExitingState)
         {
             if (!wasExitingState) return;
